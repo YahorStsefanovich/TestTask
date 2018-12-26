@@ -1,13 +1,16 @@
 let path = 'http://samples.databoom.space/api1/sampledb/collections/';
 //let path = 'https://samples.databoom.space/api1/sampledb/collections/persons?$filter=firstname eq \'Lamar\'';
+let arr = [];
 
-window.onload = ()=>{
+
+window.onload = function () {
     init();
 };
 
 function init(){
     setConfig(path);
-    getData('persons');
+    let data = getData('persons', 'age == 63');
+    toGrid(data);
 }
 
 function setConfig(path) {
@@ -16,36 +19,53 @@ function setConfig(path) {
     });
 }
 
-function getData(page) {
-    let arr = [];
-    o(page).where('age == 63').get(function(data) {
-            for (let i = 0; i < data.d.results.length; i++){
-                let elem = data.d.results[i];
-                arr.push(new Person(elem.id, elem.firstname, elem.lastname, elem.age, elem.collections, elem.likes));
-            }
-            console.log(arr);
+function getData(page, filter) {
+    o(page).where(filter).get(function(data) {
+        for (let i = 0; i < data.d.results.length; i++){
+            arr.push(new Person(data.d.results[i]));
+        }
+
+        toGrid(arr);
     });
 }
 
-function Person(id, firstname, lastname, age, collection, likes) {
-    this.id = id;
-    this.firstname = firstname;
-    this.lastname = lastname;
-    this.age = age;
-    this.collections = collection;
-    this.likes = likes;
+function toGrid(arr) {
+    let table = document.createElement('table');
+
+    for (let elem in  arr)
+        table.appendChild(createRow(arr[elem]));
+
+    document.body.appendChild(table);
 }
 
-function Book(id, author, title, publisher, collection) {
-    this.id = id;
-    this.title = title;
-    this.collections = collection;
-    this.author = author;
-    this.publisher = publisher;
+function createRow(elem) {
+    let row = document.createElement('tr');
+
+    for (let key in elem) {
+        let cell = document.createElement('td');
+        cell.innerText = elem[key];
+        row.appendChild(cell);
+    }
+
+    return row;
 }
 
-// function init (){
-//     o(path).get(function(data) {
-//         console.log(data);
-//     });
-// }
+//constructor for person
+function Person(person) {
+    this.id = person.id;
+    this.firstname = person.firstname;
+    this.lastname = person.lastname;
+    this.age = person.age;
+    this.collections = person.collections;
+    this.likes = person.likes;
+}
+
+//constructor for book
+function Book(book) {
+    this.id = book.id;
+    this.title = book.title;
+    this.collections = book.collections;
+    this.author = book.author;
+    this.publisher = book.publisher;
+}
+
