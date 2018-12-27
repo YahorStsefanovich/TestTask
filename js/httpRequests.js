@@ -1,8 +1,6 @@
 let path = 'http://samples.databoom.space/api1/sampledb/collections/';
 //let path = 'https://samples.databoom.space/api1/sampledb/collections/persons?$filter=firstname eq \'Lamar\'';
 let personList = [];
-let bookList = [];
-
 
 window.onload = function () {
     init();
@@ -10,30 +8,32 @@ window.onload = function () {
 
 function init(){
     setConfig(path);
-    let data = getData('persons', 'age == 63');
-    toGrid(data);
+    getData();
 }
 
 function setConfig(path) {
     o().config({
-        endpoint: path
+        endpoint: path,
     });
 }
 
-function getData(page, filter) {
-    o(page).where(filter).get(function(data) {
+function getData() {
+    o('allobjects').where('age == 63').expand('likes').get(function(data) {
         for (let i = 0; i < data.d.results.length; i++){
             personList.push(new Person(data.d.results[i]));
         }
-        console.log(bookList);
 
-        if (personList !== undefined){
-           // if (personList.length === 1)
-                toForm(personList[0]);
-           // else
-                toGrid(personList);
-        }
+        displayData();
     });
+}
+
+function displayData() {
+    if (personList !== undefined){
+        if (personList.length === 1)
+            toForm(personList[0]);
+        else
+            toGrid(personList);
+    }
 }
 
 //list to table view
@@ -112,12 +112,9 @@ function Person(person) {
     this.firstname = person.firstname;
     this.lastname = person.lastname;
     this.age = person.age;
-   // this.collections = person.collections;
-    this.likes = person.likes;
-    for (let bookId in person.likes){
-        if (bookList.indexOf(person.likes[bookId]) === -1){
-            bookList.push(person.likes[bookId]);
-        }
+    this.likes = [];
+    for (let book in person.likes){
+        this.likes.push(new Book(person.likes[book]));
     }
 }
 
@@ -125,8 +122,7 @@ function Person(person) {
 function Book(book) {
     this.id = book.id;
     this.title = book.title;
-    //this.collections = book.collections;
-    this.author = book.author;
-    this.publisher = book.publisher;
+    this.author = book.author[0].id;
+    this.publisher = book.publisher[0].id;
 }
 
