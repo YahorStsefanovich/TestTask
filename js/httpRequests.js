@@ -27,22 +27,60 @@ function getData(page, filter) {
         }
         console.log(bookList);
 
-        if (personList !== undefined)
-            toGrid(personList);
+        if (personList !== undefined){
+           // if (personList.length === 1)
+                toForm(personList[0]);
+           // else
+                toGrid(personList);
+        }
     });
 }
 
-function toGrid(personList) {
+//list to table view
+function toGrid(list) {
     let table = document.createElement('table');
 
-   table.appendChild(createHeadRow(personList[0]));
+    if (list !== undefined)
+        table.appendChild(createHeadRow(list[0]));
 
-    for (let elem in  personList)
-        table.appendChild(createRow(personList[elem]));
+    for (let elem in  list)
+        table.appendChild(createRow(list[elem]));
 
     document.body.appendChild(table);
 }
 
+//elem to form view
+function toForm(elem) {
+    let form = document.createElement('form');
+
+    for (let key in elem) {
+        form.appendChild(createLabel(key));
+        form.appendChild(createInput(elem[key], true));
+    }
+
+    document.body.appendChild(form);
+}
+
+function createLabel(key) {
+    let label = document.createElement('label');
+    label.innerText = key;
+    return label;
+}
+
+function createInput(elem, disabled) {
+    let input = document.createElement('input');
+    input.setAttribute('type', "text");
+    input.setAttribute('placeholder', key + "..");
+    input.value = elem;
+    input.disabled = disabled;
+    return input;
+}
+
+/**
+ * Create row for table according to elem's fields
+ * @param elem Object with data
+ * @returns {Element} html-element tr with several cells
+ */
 function createHeadRow(elem) {
     let row = document.createElement('tr');
 
@@ -55,6 +93,7 @@ function createHeadRow(elem) {
     return row;
 }
 
+//create data row for table
 function createRow(elem) {
     let row = document.createElement('tr');
 
