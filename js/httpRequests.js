@@ -14,44 +14,82 @@ function setConfig(path) {
 
 function init(){
     setConfig(path);
-    getData('age == 63');
+    document.getElementById("getBtn").addEventListener("click", getData);
+    // document.getElementById("postBtn").addEventListener("click", setFilter("post"));
+    // document.getElementById("deleteBtn").addEventListener("click", setFilter("delete"));
+    // document.getElementById("putBtn").addEventListener("click", setFilter("put"));
+    getData();
     //setData();
    // deleteData();
 }
 
-function setData() {
-    o('allobjects').post(
-        JSON.stringify(personList[0])).save(
-                (data)=>{console.log("added");},
-                (status)=>{console.error(status);}
-            );
+function setFilter() {
+    let id = document.getElementById("id").value;
+    let fname = document.getElementById("fname").value;
+    let lname = document.getElementById("lname").value;
+    let age = document.getElementById("age").value;
+
+    let filter = "";
+    if (id !== ""){
+        filter += `id eq \'${id}\'`;
+    }
+    if (fname !== ""){
+        if (filter !== "")
+            filter += " and ";
+        filter += `firstname eq \'${fname}\'`
+    }
+    if (lname !== ""){
+        if (filter !== "")
+            filter += " and ";
+        filter += `lastname eq '${lname}'`
+    }
+    if (age !== ""){
+        if (filter !== "")
+            filter += " and ";
+        filter += `age eq ${age}`;
+    }
+
+    return filter;
 }
 
-function deleteData() {
-    o('allobjects/Allobjects(1)').remove({Name:'Example 2',Description:'b'}).save(
-        (data)=>{console.log("Deleted");},
-        (status)=>{console.error(status);}
-    );
-}
+// function setData() {
+//     o('allobjects').post(
+//         JSON.stringify(personList[0])).save(
+//                 (data)=>{console.log("added");},
+//                 (status)=>{console.error(status);}
+//             );
+// }
+//
+// function deleteData() {
+//     o('allobjects/Allobjects(1)').remove({Name:'Example 2',Description:'b'}).save(
+//         (data)=>{console.log("Deleted");},
+//         (status)=>{console.error(status);}
+//     );
+// }
 
 
 
-function getData(filter) {
-    o('allobjects').where(filter).expand('likes').expand('likes/publisher').get(function(data) {
-        for (let i = 0; i < data.d.results.length; i++){
-            personList.push(new Person(data.d.results[i]));
-        }
+function getData() {
+    let filter = setFilter();
+    if (filter !== ""){
+        personList = [];
+        o('allobjects').filter(filter).expand('likes').expand('likes/publisher').get(function(data) {
+            for (let i = 0; i < data.d.results.length; i++){
+                personList.push(new Person(data.d.results[i]));
+            }
 
-        displayData();
-    });
+            displayData();
+        });
+    }
 }
 
 function displayData() {
     if (personList !== undefined){
+        document.getElementById("container").innerHTML = "";
         if (personList.length === 1)
-            document.body.appendChild(toForm(personList[0]));
+            document.getElementById("container").appendChild(toForm(personList[0]));
         else
-            document.body.appendChild(toGrid(personList));
+            document.getElementById("container").appendChild(toGrid(personList));
     }
 }
 
@@ -75,10 +113,27 @@ function toForm(elem) {
 
     for (let key in elem) {
         form.appendChild(createLabel(key));
-        form.appendChild(createInput(elem[key], true));
+        if (Array.isArray(elem[key])){
+            for (let obj in elem[key]){
+                form.appendChild(createInput(objToString(elem[key][obj]), true));
+            }
+        }
+        else
+            form.appendChild(createInput(elem[key], true));
     }
 
     return form;
+}
+
+function objToString(obj) {
+    let result = "";
+    for (let key in obj){
+        if (typeof obj[key] === "object")
+            result += `${key}(${objToString(obj[key])}`;
+        else
+            result +=  `${key}: ${obj[key]}, `;
+    }
+    return result.slice(0, -2) + ")";
 }
 
 function createLabel(key) {

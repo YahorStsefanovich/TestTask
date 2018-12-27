@@ -2,6 +2,7 @@ table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width: 100%;
+    font-size: 14pt!important;
 }
 
 td, th {
@@ -16,7 +17,7 @@ th{
 }
 
 tr:nth-child(even) {
-    /*background-color: #dddddd;*/
+    background-color: #dddddd;
 }
 
 input[type=text]:disabled {
@@ -34,7 +35,7 @@ label{
     font-size: larger;
 }
 
-input[type=submit] {
+input[type=button] {
     width: 100%;
     background-color: #4CAF50;
     color: white;
@@ -45,7 +46,7 @@ input[type=submit] {
     cursor: pointer;
 }
 
-input[type=submit]:hover {
+input[type=button]:hover {
     background-color: #45a049;
 }
 
