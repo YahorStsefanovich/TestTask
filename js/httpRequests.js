@@ -6,19 +6,38 @@ window.onload = function () {
     init();
 };
 
-function init(){
-    setConfig(path);
-    getData();
-}
-
 function setConfig(path) {
     o().config({
         endpoint: path,
     });
 }
 
-function getData() {
-    o('allobjects').where('age == 63').expand('likes').expand('likes/publisher').get(function(data) {
+function init(){
+    setConfig(path);
+    getData('age == 63');
+    //setData();
+   // deleteData();
+}
+
+function setData() {
+    o('allobjects').post(
+        JSON.stringify(personList[0])).save(
+                (data)=>{console.log("added");},
+                (status)=>{console.error(status);}
+            );
+}
+
+function deleteData() {
+    o('allobjects/Allobjects(1)').remove({Name:'Example 2',Description:'b'}).save(
+        (data)=>{console.log("Deleted");},
+        (status)=>{console.error(status);}
+    );
+}
+
+
+
+function getData(filter) {
+    o('allobjects').where(filter).expand('likes').expand('likes/publisher').get(function(data) {
         for (let i = 0; i < data.d.results.length; i++){
             personList.push(new Person(data.d.results[i]));
         }
@@ -40,11 +59,12 @@ function displayData() {
 function toGrid(list) {
     let table = document.createElement('table');
 
-    if (list !== undefined)
+    if (list !== undefined) {
         table.appendChild(createHeadRow(list[0]));
 
-    for (let elem in  list)
-        table.appendChild(createRow(list[elem]));
+        for (let elem in  list)
+            table.appendChild(createRow(list[elem]));
+    }
 
     return table;
 }
@@ -101,7 +121,9 @@ function createRow(elem) {
         let cell = document.createElement('td');
 
         if (Array.isArray(elem[key]))
-            cell.appendChild(arrayToGrid(elem[key]));
+            cell.appendChild(toGrid(elem[key]));
+        else if (typeof elem[key] === "object")
+            cell.appendChild(toGrid([elem[key]]));
         else
             cell.innerHTML = elem[key];
 
@@ -109,22 +131,6 @@ function createRow(elem) {
     }
 
     return row;
-}
-
-function arrayToGrid(list) {
-    let table = document.createElement('table');
-    table.appendChild(createHeadRow(list[0]));
-
-    for (let elem in list){
-        let row = document.createElement('tr');
-        for (let key in list[elem]){
-            let cell = document.createElement("td");
-            cell.innerHTML = list[elem][key];
-            row.appendChild(cell);
-        }
-        table.appendChild(row);
-    }
-    return table;
 }
 
 //constructor for person
@@ -147,6 +153,7 @@ function Book(book) {
     this.publisher = new Publisher(book.publisher[0]);
 }
 
+//constructor for Publisher
 function Publisher(publisher) {
     this.id = publisher.id;
     this.name = publisher.name;

@@ -10,8 +10,13 @@ td, th {
     padding: 8px;
 }
 
+th{
+    text-align: center;
+    background-color: gray!important;
+}
+
 tr:nth-child(even) {
-    background-color: #dddddd;
+    /*background-color: #dddddd;*/
 }
 
 input[type=text]:disabled {
