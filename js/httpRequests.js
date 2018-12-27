@@ -18,7 +18,7 @@ function setConfig(path) {
 }
 
 function getData() {
-    o('allobjects').where('age == 63').expand('likes').get(function(data) {
+    o('allobjects').where('age == 63').expand('likes').expand('likes/publisher').get(function(data) {
         for (let i = 0; i < data.d.results.length; i++){
             personList.push(new Person(data.d.results[i]));
         }
@@ -30,9 +30,9 @@ function getData() {
 function displayData() {
     if (personList !== undefined){
         if (personList.length === 1)
-            toForm(personList[0]);
+            document.body.appendChild(toForm(personList[0]));
         else
-            toGrid(personList);
+            document.body.appendChild(toGrid(personList));
     }
 }
 
@@ -46,7 +46,7 @@ function toGrid(list) {
     for (let elem in  list)
         table.appendChild(createRow(list[elem]));
 
-    document.body.appendChild(table);
+    return table;
 }
 
 //elem to form view
@@ -58,7 +58,7 @@ function toForm(elem) {
         form.appendChild(createInput(elem[key], true));
     }
 
-    document.body.appendChild(form);
+    return form;
 }
 
 function createLabel(key) {
@@ -123,6 +123,12 @@ function Book(book) {
     this.id = book.id;
     this.title = book.title;
     this.author = book.author[0].id;
-    this.publisher = book.publisher[0].id;
+    this.publisher = new Publisher(book.publisher[0]);
+}
+
+function Publisher(publisher) {
+    this.id = publisher.id;
+    this.name = publisher.name;
+    this.president = publisher.president[0].id;
 }
 
