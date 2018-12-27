@@ -99,11 +99,32 @@ function createRow(elem) {
 
     for (let key in elem) {
         let cell = document.createElement('td');
-        cell.innerText = elem[key];
+
+        if (Array.isArray(elem[key]))
+            cell.appendChild(arrayToGrid(elem[key]));
+        else
+            cell.innerHTML = elem[key];
+
         row.appendChild(cell);
     }
 
     return row;
+}
+
+function arrayToGrid(list) {
+    let table = document.createElement('table');
+    table.appendChild(createHeadRow(list[0]));
+
+    for (let elem in list){
+        let row = document.createElement('tr');
+        for (let key in list[elem]){
+            let cell = document.createElement("td");
+            cell.innerHTML = list[elem][key];
+            row.appendChild(cell);
+        }
+        table.appendChild(row);
+    }
+    return table;
 }
 
 //constructor for person
