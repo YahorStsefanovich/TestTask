@@ -1,5 +1,6 @@
 let path = 'http://samples.databoom.space/api1/sampledb/collections/';
 //let path = 'https://samples.databoom.space/api1/sampledb/collections/persons?$filter=firstname eq \'Lamar\'';
+//let path = 'http://localhost:63342/TestTask/';
 let personList = [];
 
 window.onload = function () {
@@ -9,6 +10,7 @@ window.onload = function () {
 function setConfig(path) {
     o().config({
         endpoint: path,
+        format: JSON
     });
 }
 
@@ -27,7 +29,8 @@ function setFilter() {
     let id = document.getElementById("id").value;
     let fname = document.getElementById("fname").value;
     let lname = document.getElementById("lname").value;
-    let age = document.getElementById("age").value;
+    let age1 = document.getElementById("age1").value;
+    let age2 = document.getElementById("age2").value;
 
     let filter = "";
     if (id !== ""){
@@ -43,10 +46,14 @@ function setFilter() {
             filter += " and ";
         filter += `lastname eq '${lname}'`
     }
-    if (age !== ""){
+    if ((age1 !== "") && (age2 !== "")){
         if (filter !== "")
             filter += " and ";
-        filter += `age eq ${age}`;
+        filter += `age gt ${age1} and age lt ${age2}`;
+    } else if (age1 !== ""){
+        if (filter !== "")
+            filter += " and ";
+        filter += `age eq ${age1}`;
     }
 
     return filter;
@@ -79,7 +86,12 @@ function getData() {
             }
 
             displayData();
-        });
+        }, function (code) {
+            if (code === 404)
+             alert("Error! Page not found(404)");
+            if (code === 500)
+                alert("Error! Internal server error(500)");
+         });
     }
 }
 
