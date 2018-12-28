@@ -19,10 +19,18 @@ function init(){
     document.getElementById("getBtn").addEventListener("click", getData);
     // document.getElementById("postBtn").addEventListener("click", setFilter("post"));
     // document.getElementById("deleteBtn").addEventListener("click", setFilter("delete"));
-    // document.getElementById("putBtn").addEventListener("click", setFilter("put"));
-    getData();
+     //document.getElementById("patchBtn").addEventListener("click", setActiveFields(false));
+   // getData();
     //setData();
    // deleteData();
+}
+
+function setActiveFields(isActive) {
+    let inputs = document.forms["resultForm"].getElementsByTagName("input");
+    for (let i = 1; i < inputs.length; i++){
+        inputs[i].disabled = isActive;
+    }
+
 }
 
 function setFilter() {
@@ -49,7 +57,7 @@ function setFilter() {
     if ((age1 !== "") && (age2 !== "")){
         if (filter !== "")
             filter += " and ";
-        filter += `age gt ${age1} and age lt ${age2}`;
+        filter += `age ge ${age1} or age le ${age2}`;
     } else if (age1 !== ""){
         if (filter !== "")
             filter += " and ";
@@ -122,6 +130,7 @@ function toGrid(list) {
 //elem to form view
 function toForm(elem) {
     let form = document.createElement('form');
+    form.id = "resultForm";
 
     for (let key in elem) {
         form.appendChild(createLabel(key));
