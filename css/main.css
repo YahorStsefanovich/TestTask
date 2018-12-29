@@ -20,7 +20,7 @@ tr:nth-child(even) {
     background-color: #dddddd;
 }
 
-input[type=text]:disabled {
+input[type=text], select {
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;

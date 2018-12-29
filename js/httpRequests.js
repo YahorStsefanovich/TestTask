@@ -1,6 +1,6 @@
-let path = 'http://samples.databoom.space/api1/sampledb/collections/';
+let path = 'http://samples.databoom.space/api1/sandboxdb/collections/';
 //let path = 'https://samples.databoom.space/api1/sampledb/collections/persons?$filter=firstname eq \'Lamar\'';
-//let path = 'http://localhost:63342/TestTask/';
+//let path = 'http://mysupermegasite/ALL/';
 let personList = [];
 
 window.onload = function () {
@@ -10,14 +10,15 @@ window.onload = function () {
 function setConfig(path) {
     o().config({
         endpoint: path,
-        format: JSON
+        format: JSON,
+        withCredentials: true
     });
 }
 
 function init(){
     setConfig(path);
     document.getElementById("getBtn").addEventListener("click", getData);
-    // document.getElementById("postBtn").addEventListener("click", setFilter("post"));
+    document.getElementById("postBtn").addEventListener("click", setData);
     // document.getElementById("deleteBtn").addEventListener("click", setFilter("delete"));
      //document.getElementById("patchBtn").addEventListener("click", setActiveFields(false));
    // getData();
@@ -67,13 +68,40 @@ function setFilter() {
     return filter;
 }
 
-// function setData() {
-//     o('allobjects').post(
-//         JSON.stringify(personList[0])).save(
-//                 (data)=>{console.log("added");},
-//                 (status)=>{console.error(status);}
-//             );
-// }
+function setData() {
+    let result = getObjectFromFields();
+    if (result === null){
+        alert("All fields requered for post request");
+    } else {
+        o('allobjects').post(
+            result).save(
+            (data)=>{console.log("added");},
+            (status)=>{console.error(status);}
+        );
+    }
+}
+
+//Create object for post request
+function getObjectFromFields() {
+    let id = document.getElementById("id").value;
+    let firstname = document.getElementById("fname").value;
+    let lastname = document.getElementById("lname").value;
+    let age = document.getElementById("age1").value;
+    let likes = document.getElementById("likes").value;
+
+    if ((id === "") || (firstname === "") || (lastname === "") || (age === "") || (likes === ""))
+        return null;
+    else {
+        let result = {};
+        result.id = id;
+        result.collections = [{id : "persons"}];
+        result.firstname = firstname;
+        result.lastname = lastname;
+        result.age = age;
+        result.likes = [{id : likes}];
+        return result;
+    }
+}
 //
 // function deleteData() {
 //     o('allobjects/Allobjects(1)').remove({Name:'Example 2',Description:'b'}).save(
@@ -96,10 +124,24 @@ function getData() {
             displayData();
         }, function (code) {
             if (code === 404)
-             alert("Error! Page not found(404)");
+                alert("Error! Page not found(404)");
             if (code === 500)
                 alert("Error! Internal server error(500)");
-         });
+        });
+    }else {
+        personList = [];
+        o('allobjects').expand('likes').expand('likes/publisher').get(function(data) {
+            for (let i = 0; i < data.d.results.length; i++){
+                personList.push(new Person(data.d.results[i]));
+            }
+
+            displayData();
+        }, function (code) {
+            if (code === 404)
+                alert("Error! Page not found(404)");
+            if (code === 500)
+                alert("Error! Internal server error(500)");
+        });
     }
 }
 
@@ -136,12 +178,14 @@ function toForm(elem) {
         form.appendChild(createLabel(key));
         if (Array.isArray(elem[key])){
             for (let obj in elem[key]){
-                form.appendChild(createInput(objToString(elem[key][obj]), true));
+                form.appendChild(createInput(objToString(elem[key][obj]), false));
             }
         }
         else
-            form.appendChild(createInput(elem[key], true));
+            form.appendChild(createInput(elem[key], false));
     }
+
+    form.appendChild(createButton("putBtn", "Put"));
 
     return form;
 }
@@ -157,6 +201,14 @@ function objToString(obj) {
     return result.slice(0, -2) + ")";
 }
 
+function createButton(id, value) {
+    let input = document.createElement('input');
+    input.setAttribute('type', "button");
+    input.value =  value;
+    input.id = id;
+    return input;
+}
+
 function createLabel(key) {
     let label = document.createElement('label');
     label.innerText = key;
@@ -166,7 +218,7 @@ function createLabel(key) {
 function createInput(elem, disabled) {
     let input = document.createElement('input');
     input.setAttribute('type', "text");
-    input.setAttribute('placeholder', key + "..");
+    input.setAttribute('placeholder', elem + "..");
     input.value = elem;
     input.disabled = disabled;
     return input;
@@ -225,8 +277,20 @@ function Person(person) {
 function Book(book) {
     this.id = book.id;
     this.title = book.title;
-    this.author = book.author[0].id;
-    this.publisher = new Publisher(book.publisher[0]);
+
+    try{
+        this.author = book.author[0].id;
+    }
+    catch (e){
+        this.author = "";
+    }
+
+    try{
+        this.publisher = new Publisher(book.publisher[0]);
+    }
+    catch (e){
+        this.publisher = "";
+    }
 }
 
 //constructor for Publisher
