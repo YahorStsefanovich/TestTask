@@ -8,10 +8,12 @@ table {
     width: 100%;
 }
 
+
 td, th {
     border: 1px solid #dddddd;
     text-align: left;
     padding: 8px;
+    margin: 0 auto;
 }
 
 th{
@@ -20,7 +22,7 @@ th{
 }
 
 tr:nth-child(even) {
-    background-color: #dddddd;
+    background-color: #3c763d;
 }
 
 input[type=text], select {
@@ -31,6 +33,12 @@ input[type=text], select {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+input[type=checkbox] {
+    display: flex;
+    min-height: 20px;
+    min-width: 20px;
 }
 
 label{
@@ -56,4 +64,11 @@ div {
     border-radius: 5px;
     background-color: #f2f2f2;
     padding: 20px;
+}
+
+.container{
+    /*display: grid;*/
+    /*grid-gap: 5px;*/
+    /*grid-template-columns: 1fr 9fr;*/
+    /*grid-template-rows: repeat(auto-fit, 100px);*/
 }

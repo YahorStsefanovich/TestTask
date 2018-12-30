@@ -132,6 +132,7 @@ function getObjectFromFields(id, firstName, lastName, age, likes) {
     result.likes = [{id : likes}];
     return result;
 }
+
 //
 // function deleteData() {
 //     o('allobjects/Allobjects(1)').remove({Name:'Example 2',Description:'b'}).save(
@@ -180,8 +181,10 @@ function displayData() {
         document.getElementById("container").innerHTML = "";
         if (personList.length === 1)
             document.getElementById("container").appendChild(toForm(personList[0]));
-        else
+        else{
             document.getElementById("container").appendChild(toGrid(personList));
+            createCheckboxes();
+        }
     }
 }
 
@@ -193,8 +196,10 @@ function toGrid(list) {
 
         table.appendChild(createHeadRow(list[0]));
 
-        for (let elem in  list)
-            table.appendChild(createRow(list[elem]))
+        for (let elem in  list){
+            table.appendChild(createRow(list[elem]));
+        }
+
 
         return table;
     }
@@ -233,12 +238,43 @@ function objToString(obj) {
 }
 
 function createButton(id, value) {
-    let input = document.createElement('input');
-    input.setAttribute('type', "button");
-    input.value =  value;
-    input.id = id;
-    input.addEventListener("click", putData);
-    return input;
+    let button = document.createElement('input');
+    button.setAttribute('type', "button");
+    button.value =  value;
+    button.id = id;
+    button.addEventListener("click", putData);
+    return button;
+}
+
+function createCheckboxes() {
+    let rows = document.getElementsByTagName("table")[0].childNodes;
+
+    //head checkBox for multiple selection
+    let checkbox = document.createElement('input');
+    checkbox.setAttribute('type', "checkbox");
+    checkbox.id = "selectAll";
+    checkbox.value = "selectAll";
+    checkbox.addEventListener( 'change', function() {
+        let checkBoxes = document.querySelectorAll('input[type="checkbox"]');
+        if(this.checked) {
+            for (let index = 1; index < checkBoxes.length; index++){
+                checkBoxes[index].checked = true;
+            }
+        } else {
+            for (let index = 1; index < checkBoxes.length; index++){
+                checkBoxes[index].checked = false;
+            }
+        }
+    });
+    rows[0].appendChild(checkbox);
+
+    for (let index = 1; index < rows.length; index++){
+        let checkbox = document.createElement('input');
+        checkbox.setAttribute('type', "checkbox");
+        checkbox.id = personList[index-1].id;
+        checkbox.value = personList[index-1].id;
+        rows[index].appendChild(checkbox);
+    }
 }
 
 function createLabel(key) {
