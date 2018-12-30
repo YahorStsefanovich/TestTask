@@ -1,8 +1,11 @@
+body{
+    font-size: 12pt!important;
+}
+
 table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
     width: 100%;
-    font-size: 14pt!important;
 }
 
 td, th {
@@ -28,7 +31,6 @@ input[type=text], select {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
-    font-size: larger;
 }
 
 label{

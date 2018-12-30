@@ -1,5 +1,5 @@
 let path = 'http://samples.databoom.space/api1/sandboxdb/collections/';
-//let path = 'https://samples.databoom.space/api1/sampledb/collections/persons?$filter=firstname eq \'Lamar\'';
+//let path1 = 'https://samples.databoom.space/api1/sampledb/collections/persons?$filter=firstname eq \'Lamar\'';
 //let path = 'http://mysupermegasite/ALL/';
 let personList = [];
 
@@ -21,18 +21,15 @@ function init(){
     document.getElementById("postBtn").addEventListener("click", setData);
     // document.getElementById("deleteBtn").addEventListener("click", setFilter("delete"));
      //document.getElementById("patchBtn").addEventListener("click", setActiveFields(false));
-   // getData();
-    //setData();
-   // deleteData();
 }
 
-function setActiveFields(isActive) {
-    let inputs = document.forms["resultForm"].getElementsByTagName("input");
-    for (let i = 1; i < inputs.length; i++){
-        inputs[i].disabled = isActive;
-    }
-
-}
+// function setActiveFields(isActive) {
+//     let inputs = document.forms["resultForm"].getElementsByTagName("input");
+//     for (let i = 1; i < inputs.length; i++){
+//         inputs[i].disabled = isActive;
+//     }
+//
+// }
 
 function setFilter() {
     let id = document.getElementById("id").value;
@@ -69,38 +66,71 @@ function setFilter() {
 }
 
 function setData() {
-    let result = getObjectFromFields();
+    let result = getObjectFromFields(
+        document.getElementById("id").value,
+        document.getElementById("fname").value,
+        document.getElementById("lname").value,
+        document.getElementById("age1").value,
+        document.getElementById("likes").value
+    );
     if (result === null){
         alert("All fields requered for post request");
     } else {
         o('allobjects').post(
             result).save(
-            (data)=>{console.log("added");},
-            (status)=>{console.error(status);}
+            (data)=>{
+                console.log("added");
+                alert("Entity added successfully");
+                },
+            (status)=>{
+                console.error(status);
+                alert("Error " + status);
+            }
+        );
+    }
+}
+
+function putData() {
+    let result = getObjectFromFields(
+        document.getElementById("idResult").value,
+        document.getElementById("firstnameResult").value,
+        document.getElementById("lastnameResult").value,
+        document.getElementById("ageResult").value,
+        document.getElementById("likesResult").value
+    );
+    if (result === null){
+        alert("All fields requered for put request");
+    } else {
+        o('allobjects').find(('\'' + id + '\'')).put(
+            result).save(
+            (data)=>{
+                console.log("added");
+                alert("Entity added successfully");
+            },
+            (status)=>{
+                console.error(status);
+                alert("Error " + status);
+            }
         );
     }
 }
 
 //Create object for post request
-function getObjectFromFields() {
-    let id = document.getElementById("id").value;
-    let firstname = document.getElementById("fname").value;
-    let lastname = document.getElementById("lname").value;
-    let age = document.getElementById("age1").value;
-    let likes = document.getElementById("likes").value;
+function getObjectFromFields(id, firstName, lastName, age, likes) {
 
-    if ((id === "") || (firstname === "") || (lastname === "") || (age === "") || (likes === ""))
-        return null;
-    else {
-        let result = {};
-        result.id = id;
-        result.collections = [{id : "persons"}];
-        result.firstname = firstname;
-        result.lastname = lastname;
-        result.age = age;
-        result.likes = [{id : likes}];
-        return result;
+    for (let elem in arguments){
+        if (arguments[elem] === "")
+            return null;
     }
+
+    let result = {};
+    result.id = id;
+    result.collections = [{id : "persons"}];
+    result.firstname = firstName;
+    result.lastname = lastName;
+    result.age = age;
+    result.likes = [{id : likes}];
+    return result;
 }
 //
 // function deleteData() {
@@ -157,16 +187,17 @@ function displayData() {
 
 //list to table view
 function toGrid(list) {
-    let table = document.createElement('table');
-
     if (list !== undefined) {
+
+        let table = document.createElement('table');
+
         table.appendChild(createHeadRow(list[0]));
 
         for (let elem in  list)
-            table.appendChild(createRow(list[elem]));
-    }
+            table.appendChild(createRow(list[elem]))
 
-    return table;
+        return table;
+    }
 }
 
 //elem to form view
@@ -178,11 +209,11 @@ function toForm(elem) {
         form.appendChild(createLabel(key));
         if (Array.isArray(elem[key])){
             for (let obj in elem[key]){
-                form.appendChild(createInput(objToString(elem[key][obj]), false));
+                form.appendChild(createInput(key, objToString(elem[key][obj]), false));
             }
         }
         else
-            form.appendChild(createInput(elem[key], false));
+            form.appendChild(createInput(key, elem[key], false));
     }
 
     form.appendChild(createButton("putBtn", "Put"));
@@ -194,11 +225,11 @@ function objToString(obj) {
     let result = "";
     for (let key in obj){
         if (typeof obj[key] === "object")
-            result += `${key}(${objToString(obj[key])}`;
+            result += `${key} : ${objToString(obj[key])}`;
         else
             result +=  `${key}: ${obj[key]}, `;
     }
-    return result.slice(0, -2) + ")";
+    return result.slice(0, -2);
 }
 
 function createButton(id, value) {
@@ -206,6 +237,7 @@ function createButton(id, value) {
     input.setAttribute('type', "button");
     input.value =  value;
     input.id = id;
+    input.addEventListener("click", putData);
     return input;
 }
 
@@ -215,12 +247,13 @@ function createLabel(key) {
     return label;
 }
 
-function createInput(elem, disabled) {
+function createInput(key, elem, disabled) {
     let input = document.createElement('input');
     input.setAttribute('type', "text");
-    input.setAttribute('placeholder', elem + "..");
+    input.setAttribute('placeholder', key + "..");
     input.value = elem;
     input.disabled = disabled;
+    input.id = key + "Result";
     return input;
 }
 
@@ -282,14 +315,14 @@ function Book(book) {
         this.author = book.author[0].id;
     }
     catch (e){
-        this.author = "";
+        this.author = "unknown";
     }
 
     try{
         this.publisher = new Publisher(book.publisher[0]);
     }
     catch (e){
-        this.publisher = "";
+        this.publisher = "unknown";
     }
 }
 
