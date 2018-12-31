@@ -31,6 +31,7 @@ function init(){
 //
 // }
 
+
 function setFilter() {
     let id = document.getElementById("id").value;
     let fname = document.getElementById("fname").value;
@@ -101,7 +102,7 @@ function putData() {
     if (result === null){
         alert("All fields requered for put request");
     } else {
-        o('allobjects').find(('\'' + id + '\'')).put(
+        o('allobjects').find(('\'' + document.getElementById("idResult").value + '\'')).put(
             result).save(
             (data)=>{
                 console.log("added");
@@ -113,6 +114,36 @@ function putData() {
             }
         );
     }
+}
+
+function deleteById(id) {
+    let url = path + "allobjects(\'" + id + "\')";
+    let xhr = new XMLHttpRequest();
+    xhr.open("DELETE", url, true);
+    xhr.onload = function () {
+        if (xhr.readyState === 4 && xhr.status === "200") {
+            console.log("Deleted");
+        } else {
+            console.error("Error");
+        }
+    };
+    xhr.send(null);
+}
+
+function deleteData() {
+
+    if (personList.length === 1){
+        deleteById(personList[0].id);
+    } else {
+        let checkBoxes = document.querySelectorAll('input[type="checkbox"]');
+
+        for (let index = 1; index < checkBoxes.length; index++){
+            if (checkBoxes[index].checked){
+                deleteById(personList[index - 1].id);
+            }
+        }
+    }
+    getData();
 }
 
 //Create object for post request
@@ -129,19 +160,14 @@ function getObjectFromFields(id, firstName, lastName, age, likes) {
     result.firstname = firstName;
     result.lastname = lastName;
     result.age = age;
-    result.likes = [{id : likes}];
+
+    result.likes = [];
+    for (let index = 0; index < likes.length; index++){
+        result.likes.push({id : likes[index].id});
+    }
+
     return result;
 }
-
-//
-// function deleteData() {
-//     o('allobjects/Allobjects(1)').remove({Name:'Example 2',Description:'b'}).save(
-//         (data)=>{console.log("Deleted");},
-//         (status)=>{console.error(status);}
-//     );
-// }
-
-
 
 function getData() {
     let filter = setFilter();
@@ -185,6 +211,9 @@ function displayData() {
             document.getElementById("container").appendChild(toGrid(personList));
             createCheckboxes();
         }
+
+        document.getElementById("container").appendChild(createButton("deleteBtn", "Delete"));
+        document.getElementById("deleteBtn").addEventListener("click", deleteData);
     }
 }
 
@@ -199,7 +228,6 @@ function toGrid(list) {
         for (let elem in  list){
             table.appendChild(createRow(list[elem]));
         }
-
 
         return table;
     }
@@ -221,7 +249,9 @@ function toForm(elem) {
             form.appendChild(createInput(key, elem[key], false));
     }
 
-    form.appendChild(createButton("putBtn", "Put"));
+    let putBtn = createButton("putBtn", "Put");
+    putBtn.addEventListener("click", putData);
+    form.appendChild(putBtn);
 
     return form;
 }
@@ -242,7 +272,6 @@ function createButton(id, value) {
     button.setAttribute('type', "button");
     button.value =  value;
     button.id = id;
-    button.addEventListener("click", putData);
     return button;
 }
 
