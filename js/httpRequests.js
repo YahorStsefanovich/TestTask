@@ -1,6 +1,4 @@
 let path = 'http://samples.databoom.space/api1/sandboxdb/collections/';
-//let path1 = 'https://samples.databoom.space/api1/sampledb/collections/persons?$filter=firstname eq \'Lamar\'';
-//let path = 'http://mysupermegasite/ALL/';
 let personList = [];
 
 window.onload = function () {
@@ -19,18 +17,7 @@ function init(){
     setConfig(path);
     document.getElementById("getBtn").addEventListener("click", getData);
     document.getElementById("postBtn").addEventListener("click", setData);
-    // document.getElementById("deleteBtn").addEventListener("click", setFilter("delete"));
-     //document.getElementById("patchBtn").addEventListener("click", setActiveFields(false));
 }
-
-// function setActiveFields(isActive) {
-//     let inputs = document.forms["resultForm"].getElementsByTagName("input");
-//     for (let i = 1; i < inputs.length; i++){
-//         inputs[i].disabled = isActive;
-//     }
-//
-// }
-
 
 function setFilter() {
     let id = document.getElementById("id").value;
@@ -203,8 +190,8 @@ function getData() {
 }
 
 function displayData() {
-    if (personList !== undefined){
-        document.getElementById("container").innerHTML = "";
+    document.getElementById("container").innerHTML = "";
+    if ((personList !== undefined) && (personList !== [])){
         if (personList.length === 1)
             document.getElementById("container").appendChild(toForm(personList[0]));
         else{
@@ -256,6 +243,11 @@ function toForm(elem) {
     return form;
 }
 
+/**
+ *
+ * @param obj
+ * @returns {string}
+ */
 function objToString(obj) {
     let result = "";
     for (let key in obj){
