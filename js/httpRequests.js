@@ -5,6 +5,10 @@ window.onload = function () {
     init();
 };
 
+/**
+ * Set config
+ * @param path - path to resource
+ */
 function setConfig(path) {
     o().config({
         endpoint: path,
@@ -19,6 +23,10 @@ function init(){
     document.getElementById("postBtn").addEventListener("click", setData);
 }
 
+/**
+ * Get conditions of search from fields
+ * @returns {string} filter-string
+ */
 function setFilter() {
     let id = document.getElementById("id").value;
     let fname = document.getElementById("fname").value;
@@ -53,6 +61,9 @@ function setFilter() {
     return filter;
 }
 
+/**
+ * Post data by POST HTTP-request
+ */
 function setData() {
     let result = getObjectFromFields(
         document.getElementById("id").value,
@@ -78,6 +89,9 @@ function setData() {
     }
 }
 
+/**
+ * Change data by PUT HTTP-request
+ */
 function putData() {
     let result = getObjectFromFields(
         document.getElementById("idResult").value,
@@ -103,6 +117,10 @@ function putData() {
     }
 }
 
+/**
+ * Delete data by DELETE HTTP-request
+ * @param id - id of person
+ */
 function deleteById(id) {
     let url = path + "allobjects(\'" + id + "\')";
     let xhr = new XMLHttpRequest();
@@ -117,6 +135,9 @@ function deleteById(id) {
     xhr.send(null);
 }
 
+/**
+ * Delete all checked records
+ */
 function deleteData() {
 
     if (personList.length === 1){
@@ -133,7 +154,15 @@ function deleteData() {
     getData();
 }
 
-//Create object for post request
+/**
+ * Create object for post request
+ * @param id I
+ * @param firstName
+ * @param lastName
+ * @param age
+ * @param likes - associated books
+ * @returns
+ */
 function getObjectFromFields(id, firstName, lastName, age, likes) {
 
     for (let elem in arguments){
@@ -156,6 +185,9 @@ function getObjectFromFields(id, firstName, lastName, age, likes) {
     return result;
 }
 
+/**
+ * Get data by get request
+ */
 function getData() {
     let filter = setFilter();
     if (filter !== ""){
@@ -189,6 +221,9 @@ function getData() {
     }
 }
 
+/**
+ * Display list of persons either in grid or form
+ */
 function displayData() {
     document.getElementById("container").innerHTML = "";
     if ((personList !== undefined) && (personList !== [])){
@@ -204,7 +239,9 @@ function displayData() {
     }
 }
 
-//list to table view
+/**
+ * list to table view
+ */
 function toGrid(list) {
     if (list !== undefined) {
 
@@ -220,7 +257,11 @@ function toGrid(list) {
     }
 }
 
-//elem to form view
+/**
+ * Remade elem to form view
+ * @param elem
+ * @returns form-element
+ */
 function toForm(elem) {
     let form = document.createElement('form');
     form.id = "resultForm";
@@ -244,9 +285,9 @@ function toForm(elem) {
 }
 
 /**
- *
+ * Convert object to string
  * @param obj
- * @returns {string}
+ * @returns string value of obj
  */
 function objToString(obj) {
     let result = "";
@@ -259,6 +300,12 @@ function objToString(obj) {
     return result.slice(0, -2);
 }
 
+/**
+ * Create button
+ * @param id
+ * @param value
+ * @returns button-element
+ */
 function createButton(id, value) {
     let button = document.createElement('input');
     button.setAttribute('type', "button");
@@ -267,6 +314,9 @@ function createButton(id, value) {
     return button;
 }
 
+/**
+ * Create checkbox
+ */
 function createCheckboxes() {
     let rows = document.getElementsByTagName("table")[0].childNodes;
 
@@ -298,6 +348,11 @@ function createCheckboxes() {
     }
 }
 
+/**
+ * Create label
+ * @param key
+ * @returns label element
+ */
 function createLabel(key) {
     let label = document.createElement('label');
     label.innerText = key;
@@ -331,7 +386,11 @@ function createHeadRow(elem) {
     return row;
 }
 
-//create data row for table
+/**
+ * Create data row for table
+ * @param elem
+ * @returns tr-element
+ */
 function createRow(elem) {
     let row = document.createElement('tr');
 
@@ -351,7 +410,11 @@ function createRow(elem) {
     return row;
 }
 
-//constructor for person
+/**
+ * Constructor for person
+ * @param person
+ * @constructor
+ */
 function Person(person) {
     this.id = person.id;
     this.firstname = person.firstname;
@@ -363,7 +426,11 @@ function Person(person) {
     }
 }
 
-//constructor for book
+/**
+ * Constructor for book
+ * @param book
+ * @constructor
+ */
 function Book(book) {
     this.id = book.id;
     this.title = book.title;
@@ -383,7 +450,11 @@ function Book(book) {
     }
 }
 
-//constructor for Publisher
+/**
+ * Constructor for Publisher
+ * @param publisher
+ * @constructor
+ */
 function Publisher(publisher) {
     this.id = publisher.id;
     this.name = publisher.name;
