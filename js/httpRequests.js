@@ -226,7 +226,7 @@ function getData() {
  */
 function displayData() {
     document.getElementById("container").innerHTML = "";
-    if ((personList !== undefined) && (personList !== [])){
+    if ((personList !== undefined) && (personList.length !== 0)){
         if (personList.length === 1)
             document.getElementById("container").appendChild(toForm(personList[0]));
         else{
