@@ -126,7 +126,7 @@ function deleteById(id) {
     let xhr = new XMLHttpRequest();
     xhr.open("DELETE", url, true);
     xhr.onload = function () {
-        if (xhr.readyState === 4 && xhr.status === "200") {
+        if ( xhr.status === "200") {
             console.log("Deleted");
         } else {
             console.error("Error");
@@ -177,10 +177,10 @@ function getObjectFromFields(id, firstName, lastName, age, likes) {
     result.lastname = lastName;
     result.age = age;
 
-    result.likes = [];
-    for (let index = 0; index < likes.length; index++){
-        result.likes.push({id : likes[index].id});
-    }
+    result.likes = likes;
+    // for (let index = 0; index < likes.length; index++){
+    //     result.likes.push({id : likes[index]);
+    // }
 
     return result;
 }
