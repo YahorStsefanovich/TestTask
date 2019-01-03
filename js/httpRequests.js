@@ -175,9 +175,13 @@ function getObjectFromFields(id, firstName, lastName, age, likes) {
     result.collections = [{id : "persons"}];
     result.firstname = firstName;
     result.lastname = lastName;
-    result.age = age;
+    result.age = parseInt(age);
 
-    result.likes = likes;
+    let start = likes.indexOf(" ");
+    let end = likes.indexOf(",");
+    likes = likes.substr(start, end - start);
+    result.likes = [];
+    result.likes.push({id : likes});
     // for (let index = 0; index < likes.length; index++){
     //     result.likes.push({id : likes[index]);
     // }
